@@ -4,25 +4,7 @@ import axios from "axios";
 import DetailComp from "../../components/DetailComp";
 import Layout from "../../components/layout/Layout";
 
-function Detail() {
-  const [detail, setDetail] = useState();
-  const router = useRouter();
-  const {
-    query: { name },
-  } = router;
-
-  useEffect(() => {
-    if (name) {
-      const fetchData = async (val) => {
-        const res = await axios.get(`/api/pokemon?name=${name}`);
-        console.log(res.data);
-
-        setDetail(res.data);
-      };
-
-      fetchData();
-    }
-  }, [name]);
+function Detail({ detail }) {
   return (
     <Layout>
       <div>
@@ -38,6 +20,16 @@ function Detail() {
       </div>
     </Layout>
   );
+}
+
+export async function getServerSideProps(context) {
+  const res = await axios.get(`http://localhost:3000/api/pokemon?name=${context.params.name}`);
+
+  return {
+    props: {
+      detail: res.data,
+    }, // will be passed to the page component as props
+  };
 }
 
 export default Detail;
