@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import axios from "axios";
+import pokemon from "../../pokemon.json";
 import DetailComp from "../../components/DetailComp";
 import Layout from "../../components/layout/Layout";
 
@@ -22,12 +20,23 @@ function Detail({ detail }) {
   );
 }
 
-export async function getServerSideProps(context) {
-  const res = await axios.get(`http://localhost:3000/api/pokemon?name=${context.params.name}`);
+export async function getStaticPaths() {
+  return {
+    paths: pokemon.map(({ name: { english } }) => ({
+      params: {
+        name: english,
+      },
+    })),
+    fallback: false, // false or 'blocking'
+  };
+}
 
+export async function getStaticProps(context) {
   return {
     props: {
-      detail: res.data,
+      detail: pokemon.filter(
+        ({ name: { english } }) => english === context.params.name
+      )[0],
     }, // will be passed to the page component as props
   };
 }
